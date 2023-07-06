@@ -1,82 +1,28 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import ReactDOM from "react-dom";
-import {
-  titleChanged,
-  taskDeleted,
-  completeTask,
-  loadTasks,
-  getTasks,
-  getTasksLoadingStatus,
-  createTask,
-} from "./store/task";
-import configureStore from "./store/store";
+import "./index.css";
+import reportWebVitals from "./reportWebVitals";
+import "bootstrap/dist/css/bootstrap.css";
+import App from "./app/App";
+import { Router } from "react-router-dom";
+import { createStore } from "./app/store/createStore";
 import { Provider } from "react-redux";
-import { useSelector, useDispatch } from "react-redux";
-import { getError } from "./store/errors";
+import history from "./app/utils/history";
 
-const store = configureStore();
-
-const App = (params) => {
-  const state = useSelector(getTasks());
-  const isLoading = useSelector(getTasksLoadingStatus());
-  const error = useSelector(getError());
-  const dispatch = useDispatch();
-
-  useEffect(() => {
-    dispatch(loadTasks());
-  }, []);
-
-  const addTask = () => {
-    dispatch(
-      createTask({
-        userId: 1,
-        title: "hello world",
-        completed: false,
-      })
-    );
-  };
-
-  const changeTitle = (taskId) => {
-    dispatch(titleChanged(taskId));
-  };
-  const deleteTask = (taskId) => {
-    dispatch(taskDeleted(taskId));
-  };
-  if (isLoading) {
-    return <h1>Loading</h1>;
-  }
-  if (error) {
-    return <p>{error}</p>;
-  }
-
-  return (
-    <>
-      <h1> App</h1>
-
-      <button onClick={addTask}>Добавить новый TO DO</button>
-      <ul>
-        {state.map((el) => (
-          <li key={el.id}>
-            <p>{el.title}</p>
-            <p> {`Completed: ${el.completed}`}</p>
-            <button onClick={() => dispatch(completeTask(el.id))}>
-              Complete
-            </button>
-            <button onClick={() => changeTitle(el.id)}>Change title</button>
-            <button onClick={() => deleteTask(el.id)}>Delete</button>
-            <hr />
-          </li>
-        ))}
-      </ul>
-    </>
-  );
-};
+const store = createStore();
 
 ReactDOM.render(
-  <React.StrictMode>
-    <Provider store={store}>
-      <App />
-    </Provider>
-  </React.StrictMode>,
-  document.getElementById("root")
+    <React.StrictMode>
+        <Provider store={store}>
+            <Router history={history}>
+                <App />
+            </Router>
+        </Provider>
+    </React.StrictMode>,
+    document.getElementById("root")
 );
+
+// If you want to start measuring performance in your app, pass a function
+// to log results (for example: reportWebVitals(console.log))
+// or send to an analytics endpoint. Learn more: https://bit.ly/CRA-vitals
+reportWebVitals();
